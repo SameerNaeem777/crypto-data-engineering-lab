@@ -61,16 +61,11 @@ def load_market_data():
         )
 
     cursor.executemany(query, rows)
-
     conn.commit()
 
     logger.info(f"Processed {len(data)} coins")
     logger.info(f"Inserted/Updated {len(rows)} records")
     logger.info("ETL Pipeline Completed Successfully")
-
-    print(f"\n✅ Processed {len(data)} coins")
-    print(f"✅ Inserted/Updated {len(rows)} records")
-    print("✅ ETL Pipeline Completed Successfully!")
 
     cursor.close()
     conn.close()
