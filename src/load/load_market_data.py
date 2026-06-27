@@ -21,11 +21,21 @@ def load_market_data():
         current_price,
         market_cap,
         market_cap_rank,
-        total_volume
+        total_volume,
+        price_change_percentage_24h,
+        last_updated
     )
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON CONFLICT (coin_id)
-    DO NOTHING;
+    DO UPDATE SET
+        symbol = EXCLUDED.symbol,
+        name = EXCLUDED.name,
+        current_price = EXCLUDED.current_price,
+        market_cap = EXCLUDED.market_cap,
+        market_cap_rank = EXCLUDED.market_cap_rank,
+        total_volume = EXCLUDED.total_volume,
+        price_change_percentage_24h = EXCLUDED.price_change_percentage_24h,
+        last_updated = EXCLUDED.last_updated;
     """
 
     rows = []
@@ -45,6 +55,8 @@ def load_market_data():
                 coin["market_cap"],
                 coin["market_cap_rank"],
                 coin["total_volume"],
+                coin["price_change_percentage_24h"],
+                coin["last_updated"],
             )
         )
 
@@ -53,11 +65,11 @@ def load_market_data():
     conn.commit()
 
     logger.info(f"Processed {len(data)} coins")
-    logger.info(f"Inserted/Checked {len(rows)} records")
+    logger.info(f"Inserted/Updated {len(rows)} records")
     logger.info("ETL Pipeline Completed Successfully")
 
     print(f"\n✅ Processed {len(data)} coins")
-    print(f"✅ Inserted/Checked {len(rows)} records")
+    print(f"✅ Inserted/Updated {len(rows)} records")
     print("✅ ETL Pipeline Completed Successfully!")
 
     cursor.close()
