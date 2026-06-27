@@ -3,13 +3,13 @@ import requests
 from src.utils.config import SETTINGS
 
 
-def fetch_markets(vs="usd", per_page=10):
+def fetch_markets(vs="usd", per_page=250, page=1):
     url = f"{SETTINGS['api_base_url']}/coins/markets"
 
     params = {
         "vs_currency": vs,
         "per_page": per_page,
-        "page": 1,
+        "page": page,
     }
 
     response = requests.get(
@@ -23,24 +23,35 @@ def fetch_markets(vs="usd", per_page=10):
     return response.json()
 
 
+def fetch_all_markets(vs="usd", max_pages=1):
+
+    all_coins = []
+
+    for page in range(1, max_pages + 1):
+
+        print(f"Fetching page {page}...")
+
+        coins = fetch_markets(
+            vs=vs,
+            per_page=250,
+            page=page,
+        )
+
+        if not coins:
+            break
+
+        all_coins.extend(coins)
+
+    return all_coins
+
+
 if __name__ == "__main__":
 
-    data = fetch_markets()
+    data = fetch_all_markets()
 
-    print(f"\n✅ Fetched {len(data)} coins\n")
+    print(f"\n✅ Total Coins Fetched: {len(data)}")
 
     first = data[0]
 
-    print("=" * 50)
-    print("FIRST COIN DETAILS")
-    print("=" * 50)
-
-    print(f"Coin Name     : {first['name']}")
-    print(f"Symbol        : {first['symbol'].upper()}")
-    print(f"Price         : ${first['current_price']:,}")
-    print(f"Market Cap    : ${first['market_cap']:,}")
-    print(f"24h Change    : {first['price_change_percentage_24h']}%")
-    print(f"Rank          : {first['market_cap_rank']}")
-    print(f"ATH           : ${first['ath']:,}")
-    print(f"ATL           : ${first['atl']}")
-    print(f"Last Updated  : {first['last_updated']}")
+    print("\nFirst Coin:")
+    print(first["name"], "-", first["symbol"].upper())
