@@ -4,7 +4,7 @@ from src.utils.config import SETTINGS
 
 def get_connection():
     return psycopg2.connect(
-        host="postgres",
+        host="localhost",
         port=5432,
         database="crypto_lab",
         user="postgres",
